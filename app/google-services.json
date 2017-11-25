@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "592594877571",
+    "firebase_url": "https://bikepooling-b9b9e.firebaseio.com",
+    "project_id": "bikepooling-b9b9e",
+    "storage_bucket": "bikepooling-b9b9e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592594877571:android:41ef98596d09aeb3",
+        "android_client_info": {
+          "package_name": "com.italo.bikepooling"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "592594877571-tibetealoo8pr8ce3b203ri2804n7e5m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6hE5WAX1tUxrA7Ty0jcZuBFsqs7b2M5M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
