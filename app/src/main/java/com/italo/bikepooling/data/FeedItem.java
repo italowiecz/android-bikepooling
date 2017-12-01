@@ -5,30 +5,20 @@ package com.italo.bikepooling.data;
  */
 
 public class FeedItem {
-    private int id;
     private String name, status, image, profilePic, timeStamp, url;
 
     public FeedItem() {
     }
 
-    public FeedItem(int id, String name, String image, String status,
+    public FeedItem(String name, String image, String status,
                     String profilePic, String timeStamp, String url) {
         super();
-        this.id = id;
         this.name = name;
         this.image = image;
         this.status = status;
         this.profilePic = profilePic;
         this.timeStamp = timeStamp;
         this.url = url;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -39,11 +29,11 @@ public class FeedItem {
         this.name = name;
     }
 
-    public String getImge() {
+    public String getImage() {
         return image;
     }
 
-    public void setImge(String image) {
+    public void setImage(String image) {
         this.image = image;
     }
 

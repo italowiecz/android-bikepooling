@@ -26,6 +26,7 @@ import com.italo.bikepooling.data.FeedItem;
 import java.util.List;
 
 public class FeedListAdapter extends BaseAdapter {
+
     private Activity activity;
     private LayoutInflater inflater;
     private List<FeedItem> feedItems;
@@ -55,24 +56,20 @@ public class FeedListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if (inflater == null)
-            inflater = (LayoutInflater) activity
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         if (convertView == null)
             convertView = inflater.inflate(R.layout.feed_item, null);
 
         if (imageLoader == null)
             imageLoader = AppController.getInstance().getImageLoader();
 
-        TextView name = (TextView) convertView.findViewById(R.id.name);
-        TextView timestamp = (TextView) convertView
-                .findViewById(R.id.timestamp);
-        TextView statusMsg = (TextView) convertView
-                .findViewById(R.id.txtStatusMsg);
-        TextView url = (TextView) convertView.findViewById(R.id.txtUrl);
-        NetworkImageView profilePic = (NetworkImageView) convertView
-                .findViewById(R.id.profilePic);
-        FeedImageView feedImageView = (FeedImageView) convertView
-                .findViewById(R.id.feedImage1);
+        TextView name = convertView.findViewById(R.id.name);
+        TextView timestamp = convertView.findViewById(R.id.timestamp);
+        TextView statusMsg = convertView.findViewById(R.id.txtStatusMsg);
+        TextView url = convertView.findViewById(R.id.txtUrl);
+        NetworkImageView profilePic = convertView.findViewById(R.id.profilePic);
+        FeedImageView feedImageView = convertView.findViewById(R.id.feedImage1);
 
         FeedItem item = feedItems.get(position);
 
@@ -81,7 +78,8 @@ public class FeedListAdapter extends BaseAdapter {
         // Converting timestamp into x ago format
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
                 Long.parseLong(item.getTimeStamp()),
-                System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS);
+                System.currentTimeMillis(),
+                DateUtils.SECOND_IN_MILLIS);
         timestamp.setText(timeAgo);
 
         // Chcek for empty status message
@@ -110,8 +108,8 @@ public class FeedListAdapter extends BaseAdapter {
         profilePic.setImageUrl(item.getProfilePic(), imageLoader);
 
         // Feed image
-        if (item.getImge() != null) {
-            feedImageView.setImageUrl(item.getImge(), imageLoader);
+        if (item.getImage() != null) {
+            feedImageView.setImageUrl(item.getImage(), imageLoader);
             feedImageView.setVisibility(View.VISIBLE);
             feedImageView
                     .setResponseObserver(new FeedImageView.ResponseObserver() {
