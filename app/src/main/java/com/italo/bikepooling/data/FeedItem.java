@@ -1,4 +1,4 @@
-package data;
+package com.italo.bikepooling.data;
 
 /**
  * Created by italo on 28/11/2017.

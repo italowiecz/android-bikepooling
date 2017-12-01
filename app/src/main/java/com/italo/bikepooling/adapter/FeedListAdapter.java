@@ -1,16 +1,8 @@
-package adapter;
+package com.italo.bikepooling.adapter;
 
 /**
  * Created by italo on 28/11/2017.
  */
-
-import com.italo.bikepooling.FeedImageView;
-import com.italo.bikepooling.R;
-
-import app.AppController;
-import data.FeedItem;
-
-import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,6 +18,12 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.italo.bikepooling.FeedImageView;
+import com.italo.bikepooling.R;
+import com.italo.bikepooling.app.AppController;
+import com.italo.bikepooling.data.FeedItem;
+
+import java.util.List;
 
 public class FeedListAdapter extends BaseAdapter {
     private Activity activity;

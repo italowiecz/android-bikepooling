@@ -1,10 +1,10 @@
-package app;
+package com.italo.bikepooling.app;
 
 /**
  * Created by italo on 28/11/2017.
  */
 
-import volley.LruBitmapCache;
+import com.italo.bikepooling.volley.LruBitmapCache;
 import android.app.Application;
 import android.text.TextUtils;
 

@@ -1,4 +1,4 @@
-package volley;
+package com.italo.bikepooling.volley;
 
 /**
  * Created by italo on 28/11/2017.
