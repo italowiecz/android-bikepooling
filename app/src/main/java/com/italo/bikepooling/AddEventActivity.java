@@ -95,6 +95,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         btCriarEvento = findViewById(R.id.novo_evento);
+        btCriarEvento.setOnClickListener(this);
         showDuration = findViewById(R.id.show_duration);
         showDistance = findViewById(R.id.show_distance_time);
         etData = findViewById(R.id.et_data);
