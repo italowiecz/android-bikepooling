@@ -1,11 +1,19 @@
 package com.italo.bikepooling;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -17,50 +25,52 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.italo.bikepooling.data.FeedItem;
 import com.italo.bikepooling.response.Example;
 import com.italo.bikepooling.service.GoogleMapsService;
 import com.italo.bikepooling.service.NetworkService;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AddEventActivity extends AppCompatActivity implements Callback<Example>, OnMapReadyCallback {
+public class AddEventActivity extends AppCompatActivity implements Callback<Example>, OnMapReadyCallback, View.OnClickListener {
 
     private DatabaseReference mDatabase;
-    private Button button;
+    private Button btCriarEvento;
     private FeedItem feedItem;
-
     private GoogleMap mMap;
-    LatLng origin;
-    LatLng dest;
-    ArrayList<LatLng> MarkerPoints;
-    TextView showDistance;
-    TextView showDuration;
-    Polyline line;
-
+    private LatLng origin;
+    private LatLng dest;
+    private ArrayList<LatLng> MarkerPoints;
+    private TextView showDistance, showDuration;
+    private Polyline line;
     private GoogleMapsService googleMapsService;
+    private EditText etData, etTime;
+    private DatePickerDialog dataPickerDialog;
+    private TimePickerDialog horaPickerDialog;
+    private SimpleDateFormat dataFormatter;
+    private SupportMapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
 
-
-        showDuration = findViewById(R.id.show_duration);
-        showDistance = findViewById(R.id.show_distance_time);
-
-        // Initializing
+        findViewsById();
+        setDateField();
+        setTimeField();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         MarkerPoints = new ArrayList<>();
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
 
 /*        mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -79,6 +89,17 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
                 mDatabase.child("feed").push().setValue(feedItem);
             }
         });*/
+    }
+
+    private void findViewsById() {
+        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        btCriarEvento = findViewById(R.id.novo_evento);
+        showDuration = findViewById(R.id.show_duration);
+        showDistance = findViewById(R.id.show_distance_time);
+        etData = findViewById(R.id.et_data);
+        etData.setInputType(InputType.TYPE_NULL);
+        etTime = findViewById(R.id.et_hora);
     }
 
     @Override
@@ -142,32 +163,6 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
                 }
             }
         });
-
-
-
-/*        Button btnDriving = findViewById(R.id.btnDriving);
-        btnDriving.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                googleMapsService.getDistanceDuration(
-                        "metric",
-                        origin.latitude + "," + origin.longitude,
-                        dest.latitude + "," + dest.longitude,
-                        "driving").enqueue(AddEventActivity.this);
-            }
-        });
-
-        Button btnWalk = findViewById(R.id.btnWalk);
-        btnWalk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                googleMapsService.getDistanceDuration(
-                        "metric",
-                        origin.latitude + "," + origin.longitude,
-                        dest.latitude + "," + dest.longitude,
-                        "walking").enqueue(AddEventActivity.this);
-            }
-        });*/
 
     }
 
@@ -235,5 +230,57 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
 
         return poly;
     }
+
+    private void setDateField() {
+        etData.setOnClickListener(this);
+        dataFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Calendar newCalendar = Calendar.getInstance();
+
+        dataPickerDialog = new DatePickerDialog(this, AlertDialog.THEME_HOLO_DARK, new DatePickerDialog.OnDateSetListener() {
+
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                Calendar newDate = Calendar.getInstance();
+                newDate.set(year, monthOfYear, dayOfMonth);
+                etData.setText(dataFormatter.format(newDate.getTime()));
+            }
+
+        }, newCalendar.get(Calendar.YEAR), newCalendar.get(Calendar.MONTH), newCalendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+    private void setTimeField() {
+        etTime.setOnClickListener(this);
+
+        Calendar newCalendar = Calendar.getInstance();
+
+        horaPickerDialog = new TimePickerDialog(this, AlertDialog.THEME_HOLO_DARK, new TimePickerDialog.OnTimeSetListener() {
+
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                etTime.setText(hourOfDay + ":" + minute);
+            }
+        }, newCalendar.get(Calendar.HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE), false);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == etData) {
+            dataPickerDialog.show();
+        } else if (v == etTime) {
+            horaPickerDialog.show();
+        } else if (v == btCriarEvento) {
+            adicionarEventoDatabase();
+        }
+    }
+
+    private void adicionarEventoDatabase() {
+        feedItem = new FeedItem();
+        feedItem.setImage("");
+        feedItem.setName("TESTE");
+        feedItem.setProfilePic("");
+        feedItem.setStatus("STATUS TESTE");
+        feedItem.setTimeStamp(String.valueOf(new Date().getTime()));
+        feedItem.setUrl("URL TESTE");
+        mDatabase.child("feed").push().setValue(feedItem);
+    }
+
 
 }
