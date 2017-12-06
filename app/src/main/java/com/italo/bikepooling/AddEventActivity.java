@@ -1,13 +1,18 @@
 package com.italo.bikepooling;
 
+import android.*;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -73,6 +78,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     private TimePickerDialog horaPickerDialog;
     private SimpleDateFormat dataFormatter;
     private SupportMapFragment mapFragment;
+    private int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +88,12 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         findViewsById();
         setDateField();
         setTimeField();
+        checkWriteExternalStoragePermission();
+
         storage = FirebaseStorage.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         MarkerPoints = new ArrayList<>();
+
 
 
 /*        mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -106,6 +115,20 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         });*/
     }
 
+    private void checkWriteExternalStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+            }
+        }
+    }
+
     private void findViewsById() {
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -124,7 +147,6 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
 
         // Add a marker in Sydney and move the camera
         LatLng Model_Town = new LatLng(-29.7608, -51.1522);
-        mMap.addMarker(new MarkerOptions().position(Model_Town));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Model_Town));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
 
@@ -288,6 +310,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     }
 
     private void adicionarEventoDatabase() {
+
         feedItem2 = new FeedItem2();
         feedItem2.setData(etData.getText().toString());
         feedItem2.setHora(etTime.getText().toString());
@@ -297,7 +320,6 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         feedItem2.setTimeStamp(String.valueOf(new Date().getTime()));
         feedItem2.setImagemProfile("");
         feedItem2.setImagemRota("");
-        Bitmap ss = captureScreen(mapFragment.getView());
         CaptureMapScreen();
 /*        feedItem = new FeedItem();
         feedItem.setImage("");
@@ -309,15 +331,6 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         mDatabase.child("feed").push().setValue(feedItem);*/
     }
 
-    private static Bitmap captureScreen(View view) {
-        int width = view.getWidth();
-        int height = view.getHeight();
-
-        Bitmap screenshot = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-        view.draw(new Canvas(screenshot));
-
-        return screenshot;
-    }
 
     private void CaptureMapScreen() {
         GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
@@ -327,32 +340,20 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
             @Override
             public void onSnapshotReady(Bitmap snapshot) {
                 bitmap = snapshot;
-                String directory = Environment.DIRECTORY_PICTURES + "/RouteScreen" + System.currentTimeMillis() + ".png";
-
                 try {
-                    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, bytes);
-                    File f = new File(directory);
-                    f.createNewFile();
-                    FileOutputStream fo = new FileOutputStream(f);
-                    fo.write(bytes.toByteArray());
-                    fo.close();
-                    //FileOutputStream out = new FileOutputStream(directory);
-
-                    Uri file = Uri.fromFile(f);
-
-                    UploadTask routeRef = storageRef.child("routes/teste.png").putFile(file);
+                    File dir = new File("dir");
+                    File storageDir = Environment.getExternalStorageDirectory();
+                    File file = new File(storageDir, Environment.DIRECTORY_DOWNLOADS + "/MyMapScreen" + System.currentTimeMillis()+".png");
+                    FileOutputStream out = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                    Uri file1 = Uri.fromFile(file);
+                    storageRef.child("routes/teste.png").putFile(file1);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         };
-
         mMap.snapshot(callback);
-
-        // myMap is object of GoogleMap +> GoogleMap myMap;
-        // which is initialized in onCreate() =>
-        // myMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_pass_home_call)).getMap();
     }
 
 
