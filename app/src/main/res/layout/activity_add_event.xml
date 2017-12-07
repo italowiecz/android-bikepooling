@@ -50,7 +50,6 @@
                         android:inputType="none"
                         android:maxLines="1"
                         android:paddingTop="10dp"
-                        android:singleLine="true"
                         android:textColor="@android:color/white"
                         android:textSize="15dp" />
 
@@ -78,7 +77,6 @@
                         android:inputType="none"
                         android:maxLines="1"
                         android:paddingTop="10dp"
-                        android:singleLine="true"
                         android:textColor="@android:color/white"
                         android:textSize="15dp" />
                 </android.support.design.widget.TextInputLayout>

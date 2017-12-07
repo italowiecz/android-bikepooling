@@ -25,12 +25,14 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -41,7 +43,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.italo.bikepooling.data.FeedItem;
-import com.italo.bikepooling.data.FeedItem2;
 import com.italo.bikepooling.response.Example;
 import com.italo.bikepooling.service.GoogleMapsService;
 import com.italo.bikepooling.service.NetworkService;
@@ -65,11 +66,10 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     private FirebaseStorage storage;
     private Button btCriarEvento;
     private FeedItem feedItem;
-    private FeedItem2 feedItem2;
     private GoogleMap mMap;
     private LatLng origin;
     private LatLng dest;
-    private ArrayList<LatLng> MarkerPoints;
+    private ArrayList<LatLng> markerPoints;
     private TextView showDistance, showDuration;
     private Polyline line;
     private GoogleMapsService googleMapsService;
@@ -92,27 +92,8 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
 
         storage = FirebaseStorage.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        MarkerPoints = new ArrayList<>();
+        markerPoints = new ArrayList<>();
 
-
-
-/*        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        button = findViewById(R.id.inserir);
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                feedItem = new FeedItem();
-                feedItem.setImage("http://torcedores.uol.com.br/content/uploads/2014/08/gremio.png");
-                feedItem.setName("Tricolor");
-                feedItem.setProfilePic("http://www.gremiopedia.com/images/thumb/d/dd/Mascote_Gr%C3%AAmio_4_2000.png/130px-Mascote_Gr%C3%AAmio_4_2000.png");
-                feedItem.setStatus("Grêmio Tricampeão da Libertadores");
-                feedItem.setTimeStamp(String.valueOf(new Date().getTime()));
-                feedItem.setUrl("http://www.gremio.net");
-                mDatabase.child("feed").push().setValue(feedItem);
-            }
-        });*/
     }
 
     private void checkWriteExternalStoragePermission() {
@@ -146,80 +127,82 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
         LatLng Model_Town = new LatLng(-29.7608, -51.1522);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Model_Town));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
 
         googleMapsService = NetworkService.getInstance().getGoogleMapsService();
 
-        // Setting onclick event listener for the map
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                // clearing map and generating new marker points if user clicks on map more than two times
-                if (MarkerPoints.size() > 1) {
+                if (markerPoints.size() > 1) {
                     mMap.clear();
-                    MarkerPoints.clear();
-                    MarkerPoints = new ArrayList<>();
+                    markerPoints.clear();
+                    markerPoints = new ArrayList<>();
                     showDistance.setText("");
                     showDuration.setText("");
                 }
 
-                // Adding new item to the ArrayList
-                MarkerPoints.add(point);
+                markerPoints.add(point);
 
-                // Creating MarkerOptions
                 MarkerOptions options = new MarkerOptions();
 
-                // Setting the position of the marker
                 options.position(point);
 
-                /**
-                 * For the start location, the color of marker is GREEN and
-                 * for the end location, the color of marker is RED.
-                 */
-                if (MarkerPoints.size() == 1) {
+                if (markerPoints.size() == 1) {
                     options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                } else if (MarkerPoints.size() == 2) {
+                } else if (markerPoints.size() == 2) {
                     options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                 }
 
-
-                // Add new marker to the Google Map Android API V2
                 mMap.addMarker(options);
 
-                // Checks, whether start and end locations are captured
-                if (MarkerPoints.size() >= 2) {
-                    origin = MarkerPoints.get(0);
-                    dest = MarkerPoints.get(1);
+                if (markerPoints.size() >= 2) {
+                    origin = markerPoints.get(0);
+                    dest = markerPoints.get(1);
+
+                    mapScaleResize();
 
                     googleMapsService.getDistanceDuration(
                             "metric",
                             origin.latitude + "," + origin.longitude,
                             dest.latitude + "," + dest.longitude,
-                            "bicycling").enqueue(AddEventActivity.this);
+                            "bicycling",
+                            "pt-BR").enqueue(AddEventActivity.this);
                 }
             }
         });
 
     }
 
+    private void mapScaleResize() {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (int i = 0; i < markerPoints.size(); i++) {
+            builder.include(markerPoints.get(i));
+        }
+        LatLngBounds bounds = builder.build();
+
+        int padding = 150; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+        mMap.animateCamera(cu);
+    }
+
     @Override
     public void onResponse(Call<Example> call, Response<Example> response) {
         try {
-            //Remove previous line from map
             if (line != null) {
                 line.remove();
             }
-            // This loop will go through all the results and add marker on each location.
             for (int i = 0; i < response.body().getRoutes().size(); i++) {
                 String distance = response.body().getRoutes().get(i).getLegs().get(i).getDistance().getText();
-                String time = response.body().getRoutes().get(i).getLegs().get(i).getDuration().getText();
+                String time = formatSecondsToHoursMinutesSeconds(response.body().getRoutes().get(i).getLegs().get(i).getDuration().getValue());
+                String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
+
                 showDistance.setText(distance);
                 showDuration.setText(time);
-                String encodedString = response.body().getRoutes().get(0).getOverviewPolyline().getPoints();
                 List<LatLng> list = decodePoly(encodedString);
+
                 line = mMap.addPolyline(new PolylineOptions()
                         .addAll(list)
                         .width(8)
@@ -231,6 +214,13 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
             Log.d("onResponse", "There is an error");
             e.printStackTrace();
         }
+    }
+
+    private String formatSecondsToHoursMinutesSeconds(Integer time) {
+        Integer horas = time / 3600;
+        Integer minutos = (time % 3600) / 60;
+        Integer segundos = time % 60;
+        return String.format("%02d:%02d:%02d", horas, minutos, segundos);
     }
 
     @Override
@@ -272,7 +262,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
 
     private void setDateField() {
         etData.setOnClickListener(this);
-        dataFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        dataFormatter = new SimpleDateFormat("dd/MM", Locale.getDefault());
         Calendar newCalendar = Calendar.getInstance();
 
         dataPickerDialog = new DatePickerDialog(this, AlertDialog.THEME_HOLO_DARK, new DatePickerDialog.OnDateSetListener() {
@@ -296,7 +286,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 etTime.setText(hourOfDay + ":" + minute);
             }
-        }, newCalendar.get(Calendar.HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE), false);
+        }, newCalendar.get(Calendar.HOUR_OF_DAY), newCalendar.get(Calendar.MINUTE), true);
     }
 
     @Override
@@ -311,30 +301,17 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     }
 
     private void adicionarEventoDatabase() {
-        feedItem = new FeedItem();
-
         CaptureMapScreen();
 
-
-
-/*        feedItem2 = new FeedItem2();
-        feedItem2.setData(etData.getText().toString());
-        feedItem2.setHora(etTime.getText().toString());
-        feedItem2.setDistancia(showDistance.getText().toString());
-        feedItem2.setTempoEstimado(showDuration.getText().toString());
-        feedItem2.setNome("Mocked User");
-        feedItem2.setTimeStamp(String.valueOf(new Date().getTime()));
-        feedItem2.setImagemRota("");
-        feedItem2.setDescricao(etDescricao.getText().toString());*/
-
-
-
-//        feedItem.setImage(feedItem2.getImagemRota());
-        feedItem.setName("TESTE URL STORAGE");
-        feedItem.setProfilePic("");
-        feedItem.setStatus("TESTE URL STORAGE");
+        feedItem = new FeedItem();
+        feedItem.setData(etData.getText().toString());
+        feedItem.setHora(etTime.getText().toString());
+        feedItem.setDistancia(showDistance.getText().toString());
+        feedItem.setTempoEstimado(showDuration.getText().toString());
+        feedItem.setNome("Mocked User");
         feedItem.setTimeStamp(String.valueOf(new Date().getTime()));
-        feedItem.setUrl("TESTE URL STORAGE");
+        feedItem.setDescricao(etDescricao.getText().toString());
+
         getImageRouteFromGoogleStorage();
     }
 
@@ -348,14 +325,14 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         storage.getReference().child("routes/teste.png").getDownloadUrl().addOnSuccessListener((new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                feedItem.setImage(uri.toString());
+                feedItem.setImagemRota(uri.toString());
                 mDatabase.child("feed").push().setValue(feedItem);
                 backToMainActivity();
             }
         })).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Log.e("tag","Erro");
+                Log.e("tag", "Erro");
             }
         });
     }

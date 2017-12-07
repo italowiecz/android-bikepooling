@@ -5,52 +5,53 @@ package com.italo.bikepooling.data;
  */
 
 public class FeedItem {
-    private String name, status, image, profilePic, timeStamp, url;
+    private String nome, descricao, imagemRota, imagemProfile, timeStamp, data, hora, distancia, tempoEstimado;
 
     public FeedItem() {
     }
 
-    public FeedItem(String name, String image, String status,
-                    String profilePic, String timeStamp, String url) {
-        super();
-        this.name = name;
-        this.image = image;
-        this.status = status;
-        this.profilePic = profilePic;
+    public FeedItem(String nome, String descricao, String imagemRota, String imagemProfile, String timeStamp, String data, String hora, String distancia, String tempoEstimado) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.imagemRota = imagemRota;
+        this.imagemProfile = imagemProfile;
         this.timeStamp = timeStamp;
-        this.url = url;
+        this.data = data;
+        this.hora = hora;
+        this.distancia = distancia;
+        this.tempoEstimado = tempoEstimado;
     }
 
-    public String getName() {
-        return name;
+    public String getNome() {
+        return nome;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public String getImage() {
-        return image;
+    public String getDescricao() {
+        return descricao;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
-    public String getStatus() {
-        return status;
+    public String getImagemRota() {
+        return imagemRota;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setImagemRota(String imagemRota) {
+        this.imagemRota = imagemRota;
     }
 
-    public String getProfilePic() {
-        return profilePic;
+    public String getImagemProfile() {
+        return imagemProfile;
     }
 
-    public void setProfilePic(String profilePic) {
-        this.profilePic = profilePic;
+    public void setImagemProfile(String imagemProfile) {
+        this.imagemProfile = imagemProfile;
     }
 
     public String getTimeStamp() {
@@ -61,12 +62,36 @@ public class FeedItem {
         this.timeStamp = timeStamp;
     }
 
-    public String getUrl() {
-        return url;
+    public String getData() {
+        return data;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
+    }
+
+    public String getDistancia() {
+        return distancia;
+    }
+
+    public void setDistancia(String distancia) {
+        this.distancia = distancia;
+    }
+
+    public String getTempoEstimado() {
+        return tempoEstimado;
+    }
+
+    public void setTempoEstimado(String tempoEstimado) {
+        this.tempoEstimado = tempoEstimado;
     }
 }
 

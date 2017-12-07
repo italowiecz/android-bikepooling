@@ -20,6 +20,7 @@ public interface GoogleMapsService {
     Call<Example> getDistanceDuration(@Query("units") String units,
                                       @Query("origin") String origin,
                                       @Query("destination") String destination,
-                                      @Query("mode") String mode);
+                                      @Query("mode") String mode,
+                                      @Query("language")String language);
 
 }

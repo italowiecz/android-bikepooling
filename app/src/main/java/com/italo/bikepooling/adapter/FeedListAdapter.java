@@ -6,14 +6,13 @@ package com.italo.bikepooling.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.text.Html;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
@@ -64,54 +63,69 @@ public class FeedListAdapter extends BaseAdapter {
         if (imageLoader == null)
             imageLoader = AppController.getInstance().getImageLoader();
 
-        TextView name = convertView.findViewById(R.id.name);
-        TextView timestamp = convertView.findViewById(R.id.timestamp);
-        TextView statusMsg = convertView.findViewById(R.id.txtStatusMsg);
-        TextView url = convertView.findViewById(R.id.txtUrl);
+        TextView etName = convertView.findViewById(R.id.name);
+        TextView etTimestamp = convertView.findViewById(R.id.timestamp);
+        EditText etData = convertView.findViewById(R.id.data);
+        EditText etHora = convertView.findViewById(R.id.hora);
+        EditText etDistance = convertView.findViewById(R.id.distance);
+        EditText etExpectedTime = convertView.findViewById(R.id.expectedTime);
+        TextView etDescriptionMsg = convertView.findViewById(R.id.descriptionMsg);
         NetworkImageView profilePic = convertView.findViewById(R.id.profilePic);
-        FeedImageView feedImageView = convertView.findViewById(R.id.feedImage1);
+        FeedImageView routeImage = convertView.findViewById(R.id.routeImage);
 
         FeedItem item = feedItems.get(position);
 
-        name.setText(item.getName());
+        etName.setText(item.getNome());
 
-        // Converting timestamp into x ago format
         CharSequence timeAgo = DateUtils.getRelativeTimeSpanString(
                 Long.parseLong(item.getTimeStamp()),
                 System.currentTimeMillis(),
                 DateUtils.SECOND_IN_MILLIS);
-        timestamp.setText(timeAgo);
+        etTimestamp.setText(timeAgo);
 
-        // Chcek for empty status message
-        if (!TextUtils.isEmpty(item.getStatus())) {
-            statusMsg.setText(item.getStatus());
-            statusMsg.setVisibility(View.VISIBLE);
+        if (!TextUtils.isEmpty(item.getDescricao())) {
+            etDescriptionMsg.setText(item.getDescricao());
+            etDescriptionMsg.setVisibility(View.VISIBLE);
         } else {
-            // status is empty, remove from view
-            statusMsg.setVisibility(View.GONE);
+            etDescriptionMsg.setVisibility(View.GONE);
         }
 
-        // Checking for null feed url
-        if (item.getUrl() != null) {
-            url.setText(Html.fromHtml("<a href=\"" + item.getUrl() + "\">"
-                    + item.getUrl() + "</a> "));
-
-            // Making url clickable
-            url.setMovementMethod(LinkMovementMethod.getInstance());
-            url.setVisibility(View.VISIBLE);
+        if (!TextUtils.isEmpty(item.getData())) {
+            etData.setText(item.getData());
+            etData.setVisibility(View.VISIBLE);
         } else {
-            // url is null, remove from the view
-            url.setVisibility(View.GONE);
+            etData.setVisibility(View.GONE);
+        }
+
+        if (!TextUtils.isEmpty(item.getHora())) {
+            etHora.setText(item.getHora());
+            etHora.setVisibility(View.VISIBLE);
+        } else {
+            etHora.setVisibility(View.GONE);
+        }
+
+        if (!TextUtils.isEmpty(item.getDistancia())) {
+            etDistance.setText(item.getDistancia());
+            etDistance.setVisibility(View.VISIBLE);
+        } else {
+            etDistance.setVisibility(View.GONE);
+        }
+
+        if (!TextUtils.isEmpty(item.getTempoEstimado())) {
+            etExpectedTime.setText(item.getTempoEstimado());
+            etExpectedTime.setVisibility(View.VISIBLE);
+        } else {
+            etExpectedTime.setVisibility(View.GONE);
         }
 
         // user profile pic
-        profilePic.setImageUrl(item.getProfilePic(), imageLoader);
+        profilePic.setImageUrl(item.getImagemProfile(), imageLoader);
 
         // Feed image
-        if (item.getImage() != null) {
-            feedImageView.setImageUrl(item.getImage(), imageLoader);
-            feedImageView.setVisibility(View.VISIBLE);
-            feedImageView
+        if (item.getImagemRota() != null) {
+            routeImage.setImageUrl(item.getImagemRota(), imageLoader);
+            routeImage.setVisibility(View.VISIBLE);
+            routeImage
                     .setResponseObserver(new FeedImageView.ResponseObserver() {
                         @Override
                         public void onError() {
@@ -122,7 +136,7 @@ public class FeedListAdapter extends BaseAdapter {
                         }
                     });
         } else {
-            feedImageView.setVisibility(View.GONE);
+            routeImage.setVisibility(View.GONE);
         }
 
         return convertView;
