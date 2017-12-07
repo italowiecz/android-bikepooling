@@ -18,7 +18,8 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            tools:context="com.italo.bikepooling.AddEventActivity" />
+            tools:context="com.italo.bikepooling.AddEventActivity"
+            android:layout_marginBottom="10dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -135,22 +136,23 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="85dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 app:counterEnabled="true"
                 app:counterMaxLength="100">
 
                 <EditText
+                    android:id="@+id/et_descricao"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:hint="Descrição"
                     android:maxLength="100"
-                    android:maxLines="1"
+                    android:maxLines="3"
                     android:textColor="@color/white"
                     android:textSize="15dp" />
 
@@ -160,7 +162,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
 
@@ -168,11 +170,12 @@
                 android:id="@+id/novo_evento"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/colorAccent"
                 android:text="Criar Evento"
                 android:textColor="@android:color/black"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_gravity="bottom"/>
         </LinearLayout>
 
     </LinearLayout>

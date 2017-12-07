@@ -1,20 +1,20 @@
 package com.italo.bikepooling;
 
-import android.*;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +23,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,19 +34,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.italo.bikepooling.data.FeedItem;
 import com.italo.bikepooling.data.FeedItem2;
 import com.italo.bikepooling.response.Example;
 import com.italo.bikepooling.service.GoogleMapsService;
 import com.italo.bikepooling.service.NetworkService;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
@@ -73,7 +73,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     private TextView showDistance, showDuration;
     private Polyline line;
     private GoogleMapsService googleMapsService;
-    private EditText etData, etTime;
+    private EditText etData, etTime, etDescricao;
     private DatePickerDialog dataPickerDialog;
     private TimePickerDialog horaPickerDialog;
     private SimpleDateFormat dataFormatter;
@@ -139,6 +139,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         etData = findViewById(R.id.et_data);
         etData.setInputType(InputType.TYPE_NULL);
         etTime = findViewById(R.id.et_hora);
+        etDescricao = findViewById(R.id.et_descricao);
     }
 
     @Override
@@ -310,27 +311,54 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     }
 
     private void adicionarEventoDatabase() {
+        feedItem = new FeedItem();
 
-        feedItem2 = new FeedItem2();
+        CaptureMapScreen();
+
+
+
+/*        feedItem2 = new FeedItem2();
         feedItem2.setData(etData.getText().toString());
         feedItem2.setHora(etTime.getText().toString());
         feedItem2.setDistancia(showDistance.getText().toString());
         feedItem2.setTempoEstimado(showDuration.getText().toString());
         feedItem2.setNome("Mocked User");
         feedItem2.setTimeStamp(String.valueOf(new Date().getTime()));
-        feedItem2.setImagemProfile("");
         feedItem2.setImagemRota("");
-        CaptureMapScreen();
-/*        feedItem = new FeedItem();
-        feedItem.setImage("");
-        feedItem.setName("TESTE");
+        feedItem2.setDescricao(etDescricao.getText().toString());*/
+
+
+
+//        feedItem.setImage(feedItem2.getImagemRota());
+        feedItem.setName("TESTE URL STORAGE");
         feedItem.setProfilePic("");
-        feedItem.setStatus("STATUS TESTE");
+        feedItem.setStatus("TESTE URL STORAGE");
         feedItem.setTimeStamp(String.valueOf(new Date().getTime()));
-        feedItem.setUrl("URL TESTE");
-        mDatabase.child("feed").push().setValue(feedItem);*/
+        feedItem.setUrl("TESTE URL STORAGE");
+        getImageRouteFromGoogleStorage();
     }
 
+    private void backToMainActivity() {
+        Toast.makeText(this, "Evento criado com sucesso!", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(AddEventActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    private void getImageRouteFromGoogleStorage() {
+        storage.getReference().child("routes/teste.png").getDownloadUrl().addOnSuccessListener((new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                feedItem.setImage(uri.toString());
+                mDatabase.child("feed").push().setValue(feedItem);
+                backToMainActivity();
+            }
+        })).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Log.e("tag","Erro");
+            }
+        });
+    }
 
     private void CaptureMapScreen() {
         GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
@@ -343,7 +371,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
                 try {
                     File dir = new File("dir");
                     File storageDir = Environment.getExternalStorageDirectory();
-                    File file = new File(storageDir, Environment.DIRECTORY_DOWNLOADS + "/MyMapScreen" + System.currentTimeMillis()+".png");
+                    File file = new File(storageDir, Environment.DIRECTORY_DOWNLOADS + "/MyMapScreen" + System.currentTimeMillis() + ".png");
                     FileOutputStream out = new FileOutputStream(file);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
                     Uri file1 = Uri.fromFile(file);
@@ -355,6 +383,5 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         };
         mMap.snapshot(callback);
     }
-
 
 }

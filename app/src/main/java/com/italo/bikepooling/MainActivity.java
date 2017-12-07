@@ -54,12 +54,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Iterable<DataSnapshot> childDataSnapshot = dataSnapshot.child("feed").getChildren();
-
                 while (childDataSnapshot.iterator().hasNext()) {
                     DataSnapshot data = childDataSnapshot.iterator().next();
                     feedItems.add(data.getValue(FeedItem.class));
                 }
-
                 listAdapter.notifyDataSetChanged();
             }
 
