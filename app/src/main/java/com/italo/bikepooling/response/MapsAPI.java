@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by italo on 02/12/2017.
+ * Created by italo on 09/12/2017.
  */
 
-public class Example {
+public class MapsAPI {
 
     @SerializedName("routes")
     @Expose
@@ -30,5 +30,4 @@ public class Example {
     public void setRoutes(List<Route> routes) {
         this.routes = routes;
     }
-
 }

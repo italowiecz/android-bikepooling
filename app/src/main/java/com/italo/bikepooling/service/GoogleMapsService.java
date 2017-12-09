@@ -1,6 +1,6 @@
 package com.italo.bikepooling.service;
 
-import com.italo.bikepooling.response.Example;
+import com.italo.bikepooling.response.MapsAPI;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -17,7 +17,7 @@ public interface GoogleMapsService {
      * And our method that will return us details of student.
      */
     @GET("api/directions/json?key=AIzaSyDo0BDeiIVsCXXrI5swtXgkwCsOx0ijUI4")
-    Call<Example> getDistanceDuration(@Query("units") String units,
+    Call<MapsAPI> getDistanceDuration(@Query("units") String units,
                                       @Query("origin") String origin,
                                       @Query("destination") String destination,
                                       @Query("mode") String mode,

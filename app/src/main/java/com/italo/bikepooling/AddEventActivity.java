@@ -43,7 +43,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.italo.bikepooling.data.FeedItem;
-import com.italo.bikepooling.response.Example;
+import com.italo.bikepooling.response.MapsAPI;
 import com.italo.bikepooling.service.GoogleMapsService;
 import com.italo.bikepooling.service.NetworkService;
 
@@ -60,7 +60,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AddEventActivity extends AppCompatActivity implements Callback<Example>, OnMapReadyCallback, View.OnClickListener {
+public class AddEventActivity extends AppCompatActivity implements Callback<MapsAPI>, OnMapReadyCallback, View.OnClickListener {
 
     private DatabaseReference mDatabase;
     private FirebaseStorage storage;
@@ -189,7 +189,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     }
 
     @Override
-    public void onResponse(Call<Example> call, Response<Example> response) {
+    public void onResponse(Call<MapsAPI> call, Response<MapsAPI> response) {
         try {
             if (line != null) {
                 line.remove();
@@ -224,7 +224,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
     }
 
     @Override
-    public void onFailure(Call<Example> call, Throwable t) {
+    public void onFailure(Call<MapsAPI> call, Throwable t) {
     }
 
     private List<LatLng> decodePoly(String encoded) {
@@ -311,12 +311,12 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
         feedItem.setNome("Mocked User");
         feedItem.setTimeStamp(String.valueOf(new Date().getTime()));
         feedItem.setDescricao(etDescricao.getText().toString());
+        feedItem.setImagemProfile("https://image.freepik.com/free-icon/male-user-silhouette_318-35708.jpg");
 
         getImageRouteFromGoogleStorage();
     }
 
     private void backToMainActivity() {
-        Toast.makeText(this, "Evento criado com sucesso!", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(AddEventActivity.this, MainActivity.class);
         startActivity(intent);
     }
@@ -327,6 +327,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
             public void onSuccess(Uri uri) {
                 feedItem.setImagemRota(uri.toString());
                 mDatabase.child("feed").push().setValue(feedItem);
+                Toast.makeText(AddEventActivity.this, "Evento criado com sucesso!", Toast.LENGTH_SHORT).show();
                 backToMainActivity();
             }
         })).addOnFailureListener(new OnFailureListener() {
@@ -346,7 +347,6 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
             public void onSnapshotReady(Bitmap snapshot) {
                 bitmap = snapshot;
                 try {
-                    File dir = new File("dir");
                     File storageDir = Environment.getExternalStorageDirectory();
                     File file = new File(storageDir, Environment.DIRECTORY_DOWNLOADS + "/MyMapScreen" + System.currentTimeMillis() + ".png");
                     FileOutputStream out = new FileOutputStream(file);
@@ -359,6 +359,11 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Exam
             }
         };
         mMap.snapshot(callback);
+    }
+
+    @Override
+    public void onBackPressed() {
+        backToMainActivity();
     }
 
 }

@@ -31,7 +31,8 @@
                     android:id="@+id/profilePic"
                     android:layout_width="@dimen/feed_item_profile_pic"
                     android:layout_height="@dimen/feed_item_profile_pic"
-                    android:scaleType="fitCenter" />
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/user"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -59,7 +60,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="4">
+                android:weightSum="4"
+                android:paddingTop="10dp"
+                android:paddingBottom="5dp">
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
@@ -167,7 +170,7 @@
                 android:id="@+id/routeImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
+                android:background="@android:color/white"
                 android:scaleType="fitXY"
                 android:visibility="visible" />
         </LinearLayout>
