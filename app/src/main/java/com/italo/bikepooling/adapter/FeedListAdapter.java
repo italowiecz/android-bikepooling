@@ -118,10 +118,8 @@ public class FeedListAdapter extends BaseAdapter {
             etExpectedTime.setVisibility(View.GONE);
         }
 
-        // user profile pic
         profilePic.setImageUrl(item.getImagemProfile(), imageLoader);
 
-        // Feed image
         if (item.getImagemRota() != null) {
             routeImage.setImageUrl(item.getImagemRota(), imageLoader);
             routeImage.setVisibility(View.VISIBLE);

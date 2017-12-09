@@ -12,10 +12,6 @@ import retrofit2.http.Query;
 
 public interface GoogleMapsService {
 
-    /*
-     * Retrofit get annotation with our URL
-     * And our method that will return us details of student.
-     */
     @GET("api/directions/json?key=AIzaSyDo0BDeiIVsCXXrI5swtXgkwCsOx0ijUI4")
     Call<MapsAPI> getDistanceDuration(@Query("units") String units,
                                       @Query("origin") String origin,

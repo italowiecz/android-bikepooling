@@ -19,38 +19,18 @@ public class Route {
     @Expose
     private OverviewPolyline overviewPolyline;
 
-    /**
-     *
-     * @return
-     * The legs
-     */
     public List<Leg> getLegs() {
         return legs;
     }
 
-    /**
-     *
-     * @param legs
-     * The legs
-     */
     public void setLegs(List<Leg> legs) {
         this.legs = legs;
     }
 
-    /**
-     *
-     * @return
-     * The overviewPolyline
-     */
     public OverviewPolyline getOverviewPolyline() {
         return overviewPolyline;
     }
 
-    /**
-     *
-     * @param overviewPolyline
-     * The overview_polyline
-     */
     public void setOverviewPolyline(OverviewPolyline overviewPolyline) {
         this.overviewPolyline = overviewPolyline;
     }

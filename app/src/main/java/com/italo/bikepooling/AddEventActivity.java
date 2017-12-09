@@ -79,6 +79,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Maps
     private SimpleDateFormat dataFormatter;
     private SupportMapFragment mapFragment;
     private int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -322,7 +323,7 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Maps
     }
 
     private void getImageRouteFromGoogleStorage() {
-        storage.getReference().child("routes/teste.png").getDownloadUrl().addOnSuccessListener((new OnSuccessListener<Uri>() {
+        storage.getReference().child("routes" + path).getDownloadUrl().addOnSuccessListener((new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 feedItem.setImagemRota(uri.toString());
@@ -341,19 +342,22 @@ public class AddEventActivity extends AppCompatActivity implements Callback<Maps
     private void CaptureMapScreen() {
         GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
             Bitmap bitmap;
-            StorageReference storageRef = storage.getReference();
+
 
             @Override
             public void onSnapshotReady(Bitmap snapshot) {
                 bitmap = snapshot;
                 try {
+                    StorageReference storageRef = storage.getReference();
+                    path = "/RouteImage" + System.currentTimeMillis() + ".png";
                     File storageDir = Environment.getExternalStorageDirectory();
-                    File file = new File(storageDir, Environment.DIRECTORY_DOWNLOADS + "/MyMapScreen" + System.currentTimeMillis() + ".png");
+                    File file = new File(storageDir, Environment.DIRECTORY_DOWNLOADS + path);
                     FileOutputStream out = new FileOutputStream(file);
                     bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-                    Uri file1 = Uri.fromFile(file);
-                    storageRef.child("routes/teste.png").putFile(file1);
+                    Uri fileUrl = Uri.fromFile(file);
+                    storageRef.child("routes" + path).putFile(fileUrl);
                 } catch (Exception e) {
+                    Log.e("ADD EVENTO BANCO", "Erro!");
                     e.printStackTrace();
                 }
             }
